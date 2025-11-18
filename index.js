@@ -1,35 +1,66 @@
 let items = [
-	"Сделать проектную работу",
-	"Полить цветы",
-	"Пройти туториал по Реакту",
-	"Сделать фронт для своего проекта",
-	"Прогуляться по улице в солнечный день",
-	"Помыть посуду",
-];
+	'Сделать проектную работу',
+	'Полить цветы',
+	'Пройти туториал по Реакту',
+	'Сделать фронт для своего проекта',
+	'Прогуляться по улице в солнечный день',
+	'Помыть посуду',
+]
 
-const listElement = document.querySelector(".to-do__list");
-const formElement = document.querySelector(".to-do__form");
-const inputElement = document.querySelector(".to-do__input");
+const listElement = document.querySelector('.to-do__list')
+const formElement = document.querySelector('.to-do__form')
+const inputElement = document.querySelector('.to-do__input')
 
 function loadTasks() {
-
+	return [
+		'Сделать проектную работу',
+		'Полить цветы',
+		'Пройти туториал по Реакту',
+		'Сделать фронт для своего проекта',
+		'Прогуляться по улице в солнечный день',
+		'Помыть посуду',
+	]
 }
+
+items = loadTasks()
+
+items.forEach(el => {
+	listElement.append(createItem(el))
+})
 
 function createItem(item) {
-	const template = document.getElementById("to-do__item-template");
-	const clone = template.content.querySelector(".to-do__item").cloneNode(true);
-  const textElement = clone.querySelector(".to-do__item-text");
-  const deleteButton = clone.querySelector(".to-do__item-button_type_delete");
-  const duplicateButton = clone.querySelector(".to-do__item-button_type_duplicate");
-  const editButton = clone.querySelector(".to-do__item-button_type_edit");
+	const template = document.getElementById('to-do__item-template')
+	const clone = template.content.querySelector('.to-do__item').cloneNode(true)
+	const textElement = clone.querySelector('.to-do__item-text')
+	const deleteButton = clone.querySelector('.to-do__item-button_type_delete')
+	const duplicateButton = clone.querySelector(
+		'.to-do__item-button_type_duplicate'
+	)
+	const editButton = clone.querySelector('.to-do__item-button_type_edit')
 
+	textElement.textContent = item
+	return clone
 }
+
+formElement.addEventListener('submit', e => {
+	e.preventDefault()
+
+	let text = inputElement.value
+	if (text == '') return
+
+	listElement.prepend(createItem(text))
+
+	inputElement.value = ''
+})
 
 function getTasksFromDOM() {
+	const itemsNamesElements = querySelectorAll('.to-do__item-text')
 
+	tasks = []
+
+	itemsNamesElements.forEach(el => {
+		tasks.push(el.textContent)
+	})
 }
 
-function saveTasks(tasks) {
-
-}
-
+function saveTasks(tasks) {}
