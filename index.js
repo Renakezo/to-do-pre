@@ -12,14 +12,9 @@ const formElement = document.querySelector('.to-do__form')
 const inputElement = document.querySelector('.to-do__input')
 
 function loadTasks() {
-	return [
-		'Сделать проектную работу',
-		'Полить цветы',
-		'Пройти туториал по Реакту',
-		'Сделать фронт для своего проекта',
-		'Прогуляться по улице в солнечный день',
-		'Помыть посуду',
-	]
+	let tasks = localStorage.getItem('tasks')
+
+	return tasks ? JSON.parse(tasks) : items
 }
 
 items = loadTasks()
@@ -50,17 +45,24 @@ formElement.addEventListener('submit', e => {
 
 	listElement.prepend(createItem(text))
 
+	items = getTasksFromDOM()
+	saveTasks(items)
+
 	inputElement.value = ''
 })
 
 function getTasksFromDOM() {
-	const itemsNamesElements = querySelectorAll('.to-do__item-text')
+	const itemsNamesElements = document.querySelectorAll('.to-do__item-text')
 
 	tasks = []
 
 	itemsNamesElements.forEach(el => {
 		tasks.push(el.textContent)
 	})
+
+	return tasks
 }
 
-function saveTasks(tasks) {}
+function saveTasks(tasks) {
+	localStorage.setItem('tasks', JSON.stringify(tasks))
+}
