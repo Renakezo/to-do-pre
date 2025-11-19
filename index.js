@@ -33,6 +33,19 @@ function createItem(item) {
 	)
 	const editButton = clone.querySelector('.to-do__item-button_type_edit')
 
+	deleteButton.addEventListener('click', () => {
+		clone.remove()
+		items = getTasksFromDOM()
+		saveTasks(items)
+	})
+
+	duplicateButton.addEventListener('click', () => {
+		let newItem = createItem(item)
+		listElement.prepend(newItem)
+		items = getTasksFromDOM()
+		saveTasks(items)
+	})
+
 	textElement.textContent = item
 	return clone
 }
