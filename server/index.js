@@ -2,10 +2,12 @@ const express = require('express')
 const app = express()
 const sqlite3 = require('sqlite3').verbose()
 const path = require('path')
+const cors = require('cors')
 
 const port = 3000
 
 app.use(express.json())
+app.use(cors())
 
 const dbPath = path.join(__dirname, 'tasks.db')
 const db = new sqlite3.Database(dbPath)
@@ -88,6 +90,20 @@ app.put('/api/updateTask', (req, res) => {
 			},
 		})
 	})
+})
+
+app.get('/api/setTestData', (req, res) => {
+	db.run(
+		'INSERT INTO tasks (name) VALUES ("1 задача"), ("2 задача"), ("3 задача")',
+		[],
+		err => {
+			if (err) return res.status(500).json({ error: err.message })
+
+			res.json({
+				message: 'Test tasks created successfully',
+			})
+		}
+	)
 })
 
 app.listen(port, () => {

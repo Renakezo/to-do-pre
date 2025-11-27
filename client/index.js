@@ -11,17 +11,19 @@ const listElement = document.querySelector('.to-do__list')
 const formElement = document.querySelector('.to-do__form')
 const inputElement = document.querySelector('.to-do__input')
 
-function loadTasks() {
-	let tasks = localStorage.getItem('tasks')
-
-	return tasks ? JSON.parse(tasks) : items
+listElement.innerHTML = 'Загрузка задач'
+const loadTasks = () => {
+	fetch('http://127.0.0.1:3000/api/getAllTasks')
+		.then(responce => responce.json())
+		.then(data => {
+			listElement.innerHTML = ''
+			data.data.forEach(el => {
+				listElement.append(createItem(el.name))
+			})
+		})
 }
 
-items = loadTasks()
-
-items.forEach(el => {
-	listElement.append(createItem(el))
-})
+loadTasks()
 
 function createItem(item) {
 	const template = document.getElementById('to-do__item-template')
@@ -67,10 +69,7 @@ formElement.addEventListener('submit', e => {
 	let text = inputElement.value
 	if (text == '') return
 
-	listElement.prepend(createItem(text))
-
-	items = getTasksFromDOM()
-	saveTasks(items)
+	saveTask(text)
 
 	inputElement.value = ''
 })
@@ -87,6 +86,11 @@ function getTasksFromDOM() {
 	return tasks
 }
 
-function saveTasks(tasks) {
-	localStorage.setItem('tasks', JSON.stringify(tasks))
+const saveTask = task => {
+	fetch('http://127.0.0.1:3000/api/setTask', {
+		method: 'POST',
+		body: JSON.stringify({
+			name: task,
+		}),
+	}).then(response => loadTasks())
 }
