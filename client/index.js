@@ -12,20 +12,20 @@ const formElement = document.querySelector('.to-do__form')
 const inputElement = document.querySelector('.to-do__input')
 
 listElement.innerHTML = 'Загрузка задач'
-const loadTasks = () => {
-	fetch('http://127.0.0.1:3000/api/getAllTasks')
+const loadTasks = async () => {
+	await fetch('http://127.0.0.1:3000/api/getAllTasks')
 		.then(responce => responce.json())
 		.then(data => {
 			listElement.innerHTML = ''
 			data.data.forEach(el => {
-				listElement.append(createItem(el.name))
+				listElement.append(createItem(el.id, el.name))
 			})
 		})
 }
 
 loadTasks()
 
-function createItem(item) {
+const createItem = (id, item) => {
 	const template = document.getElementById('to-do__item-template')
 	const clone = template.content.querySelector('.to-do__item').cloneNode(true)
 	const textElement = clone.querySelector('.to-do__item-text')
@@ -35,17 +35,21 @@ function createItem(item) {
 	)
 	const editButton = clone.querySelector('.to-do__item-button_type_edit')
 
-	deleteButton.addEventListener('click', () => {
+	deleteButton.addEventListener('click', async () => {
 		clone.remove()
-		items = getTasksFromDOM()
-		saveTasks(items)
+		await fetch('http://127.0.0.1:3000/api/deleteTask', {
+			method: 'DELETE',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				id: id,
+			}),
+		}).then(response => loadTasks())
 	})
 
 	duplicateButton.addEventListener('click', () => {
-		let newItem = createItem(item)
-		listElement.prepend(newItem)
-		items = getTasksFromDOM()
-		saveTasks(items)
+		saveTask(item)
 	})
 
 	editButton.addEventListener('click', () => {
@@ -53,10 +57,18 @@ function createItem(item) {
 		textElement.focus()
 	})
 
-	textElement.addEventListener('blur', () => {
+	textElement.addEventListener('blur', async () => {
+		await fetch('http://127.0.0.1:3000/api/updateTask', {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				id: id,
+				name: textElement.textContent,
+			}),
+		}).then(response => loadTasks())
 		textElement.setAttribute('contenteditable', false)
-		items = getTasksFromDOM()
-		saveTasks(items)
 	})
 
 	textElement.textContent = item
@@ -86,9 +98,12 @@ function getTasksFromDOM() {
 	return tasks
 }
 
-const saveTask = task => {
-	fetch('http://127.0.0.1:3000/api/setTask', {
+const saveTask = async task => {
+	await fetch('http://127.0.0.1:3000/api/setTask', {
 		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
 		body: JSON.stringify({
 			name: task,
 		}),
